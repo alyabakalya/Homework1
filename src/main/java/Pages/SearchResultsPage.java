@@ -1,19 +1,16 @@
 package Pages;
 
-import java.util.List;
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 public class SearchResultsPage extends BasePage{
-	@FindBy(xpath = "//button[contains(text(), 'Refine results')]")
-	WebElement refineResultsButton;
-
-	@FindBy(xpath = "//a[@data-isbn='9780131872486']")
-	WebElement testProductThinkingInJava;
-
-	@FindBy(xpath = "//div[@class='book-item']")
-	List<WebElement> allBooksOnSearchPage;
+	SelenideElement refineResultsButton = $(byXpath("//button[contains(text(), 'Refine results')]"));
+	SelenideElement testProductThinkingInJava= $(byXpath("//a[@data-isbn='9780131872486']"));
+	ElementsCollection allBooksOnSearchPage = $$(byXpath("//div[@class='book-item']"));
 
 	String filterYourSearchDropDown = "//label[text()='%s']//following-sibling::select";
 
@@ -29,7 +26,7 @@ public class SearchResultsPage extends BasePage{
 		return String.format(filterYourSearchDropDown, filterName);
 	}
 
-	public List<WebElement> getAllBooksOnSearchPage() {
+	public ElementsCollection getAllBooksOnSearchPage() {
 		return allBooksOnSearchPage;
 	}
 }

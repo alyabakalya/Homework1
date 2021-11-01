@@ -1,42 +1,27 @@
 package Pages;
 
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.Select;
-
-import CucumberDriver.DriverManager;
+import com.codeborne.selenide.SelenideElement;
 import DTO.UserDTO;
 
 public class PaymentForm extends CheckoutPage {
 
-	@FindBy(xpath = "//input[@name='delivery-fullName']")
-	WebElement fullNameInputField;
-
-	@FindBy(xpath = "//input[@name='delivery-addressLine1']")
-	WebElement addressLine1InputField;
-
-	@FindBy(xpath = "//input[@name='delivery-addressLine2']")
-	WebElement addressLine2InputField;
-
-	@FindBy(xpath = "//input[@name='delivery-city']")
-	WebElement deliveryCityTownInputField;
-
-	@FindBy(xpath = "//input[@name='delivery-county']")
-	WebElement deliveryCountyStateInputField;
-
-	@FindBy(xpath = "//input[@name='delivery-postCode']")
-	WebElement deliveryPostCode;
-
-	@FindBy(name="deliveryCountry")
-	WebElement deliveryCountryDropDown;
+	SelenideElement fullNameInputField = $(byXpath("//input[@name='delivery-fullName']"));
+	SelenideElement addressLine1InputField = $(byXpath("//input[@name='delivery-addressLine1']"));
+	SelenideElement addressLine2InputField = $(byXpath("//input[@name='delivery-addressLine2']"));
+	SelenideElement deliveryCityTownInputField = $(byXpath("//input[@name='delivery-city']"));
+	SelenideElement deliveryCountyStateInputField = $(byXpath("//input[@name='delivery-county']"));
+	SelenideElement deliveryPostCode = $(byXpath("//input[@name='delivery-postCode']"));
+	SelenideElement deliveryCountryDropDown = $(By.name("deliveryCountry"));
 
 	public void setFullName(String fullName) {
 		sendValueToInputField(fullNameInputField, fullName);
 	}
 
-	public void setCountry(Select dropDown, String deliveryCountry) {
-		dropDown.selectByVisibleText(deliveryCountry);
+	public void setCountry(SelenideElement dropDown, String deliveryCountry) {
+		dropDown.selectOptionContainingText(deliveryCountry);
 		exitFrame();
 	}
 
@@ -62,7 +47,7 @@ public class PaymentForm extends CheckoutPage {
 
 	public PaymentForm fillAddressForm(UserDTO addressInfo) {
 		setFullName(addressInfo.fullName);
-		setCountry(getNewSelect(deliveryCountryDropDown), addressInfo.deliveryCountry);
+		setCountry(deliveryCountryDropDown, addressInfo.deliveryCountry);
 		setAddressLine1(addressInfo.addressLine1);
 		setAddressLine2(addressInfo.addressLine2);
 		setDeliveryCityTown(addressInfo.deliveryTownOrCity);

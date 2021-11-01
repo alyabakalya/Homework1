@@ -1,32 +1,28 @@
 package Pages;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
+
+import com.codeborne.selenide.SelenideElement;
 
 import JavaScriptExecutor.JSExecutor;
 
+
 public class BasketPage extends BasePage {
-	@FindBy(xpath = "//dl[@class='delivery-text']/dd")
-	WebElement deliveryCost;
-
-	@FindBy(xpath = "//dl[@class='total']/dd")
-	WebElement orderTotal;
-
-	@FindBy(xpath = "//a[@class='checkout-btn btn optimizely-variation-1 original-bucket']")
-	WebElement checkoutButton;
-
-	public String getDeliveryCostTextValue() {
-		JSExecutor.executeHighlightingJavaScript(deliveryCost);
-		return getTextValue(deliveryCost);
-	}
-
-	public String getOrderTotalTextValue() {
-		JSExecutor.executeHighlightingJavaScript(orderTotal);
-		return getTextValue(orderTotal);
-	}
+	SelenideElement deliveryCost = $(byXpath("//dl[@class='delivery-text']/dd"));
+	SelenideElement orderTotal = $(byXpath("//dl[@class='total']/dd"));
+	SelenideElement checkoutButton = $(byXpath("//a[@class='checkout-btn btn optimizely-variation-1 original-bucket']"));
 
 	public void clickOnCheckoutButton() {
 		JSExecutor.scrollUntilElementIsVisible(checkoutButton);
 		JSExecutor.executeClickOnElementJavaScript(checkoutButton);
+	}
+
+	public void assertTextOfDeliveryCostValue(String expectedText) {
+		assertThatElementContainsExpectedText(deliveryCost, expectedText);
+	}
+
+	public void assertTextOfOrderCostValue(String expectedText) {
+		assertThatElementContainsExpectedText(orderTotal, expectedText);
 	}
 }

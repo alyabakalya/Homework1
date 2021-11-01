@@ -28,7 +28,7 @@ Feature: Desktop Checkout for Guest User
     Then I am redirected to the Basket page
     And Basket order summary is as following:
       | Delivery cost | Total   |
-      | FREE          | 89,92 € |
+      | FREE          | 85,21 € |
     When I click "Checkout" button on Basket page
     Then I am transferred to Checkout page
     When I click "Buy now" button
@@ -43,7 +43,7 @@ Feature: Desktop Checkout for Guest User
       | Please enter your card number Please enter your card's expiration date Please enter your CVV |
     And Checkout order summary is as following:
       | Sub-total | Delivery | VAT    | Total   |
-      | 89,92 €   | FREE     | 0,00 € | 89,92 € |
+      | 85,21 €   | FREE     | 0,00 € | 85,21 € |
     And I checkout as a new customer with email test@user.com
     When I fill delivery address information manually:
       | Full name | Delivery country | Address line 1   | Address line 2   | Town/City | County/State | Postcode |

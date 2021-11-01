@@ -1,14 +1,18 @@
 package Pages;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.$;
+
+import com.codeborne.selenide.SelenideElement;
+
+
 
 public class BasketPopUp extends BasePage {
-	@FindBy(xpath = "//a[@data-default-localized-pattern='Basket / Checkout']")
-	WebElement basketCheckoutButton;
+	SelenideElement basketCheckoutButton = $(byXpath("//a[@data-default-localized-pattern='Basket / Checkout']"));
 
 	public void clickOnBasketCheckoutButton() {
-		waitForElement(basketCheckoutButton, 10);
+		waitUntilElementIsDisplayed(basketCheckoutButton, 10);
 		clickElement(basketCheckoutButton);
 	}
+
 }

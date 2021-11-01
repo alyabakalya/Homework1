@@ -1,19 +1,15 @@
 package cucumberStepsDefinitions;
 
+import static com.codeborne.selenide.CollectionCondition.*;
+import static com.codeborne.selenide.Selectors.byXpath;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
-
+import static com.codeborne.selenide.Selenide.*;
 import java.util.*;
 
-import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
+import com.codeborne.selenide.*;
 
-import CucumberDriver.DriverManager;
 import DTO.UserDTO;
-import JavaScriptExecutor.JSExecutor;
 import Pages.*;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
 
 public class DesktopCheckoutForGuestUserStepDefinitions {
@@ -27,12 +23,12 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 
 	@Given("I am an anonymous customer with clear cookies")
 	public void clearCookies() {
-		DriverManager.getDriver().manage().deleteAllCookies();
+		Selenide.clearBrowserCookies();
 	}
 
 	@When("I open the Initial home page")
 	public void openInitialPage() {
-		PageNavigation.openPage(DriverManager.getDriver(), "https://www.bookdepository.com/");
+		PageNavigation.openPage("https://www.bookdepository.com/");
 	}
 
 	@And("^I search for ([\\w\\s]+)$")
@@ -42,27 +38,21 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 
 	@And("^I am redirected to a ([\\w\\s]+)$")
 	public void verifyUserIsRedirectedToSearchPageWithCorrectURL(String pageName) {
-		Assert.assertEquals("Search page URL is incorrect", BasePage.getExpectedUrlValue(pageName),
-				JSExecutor.getPageURLJavaScript());
+		basePage.assertCorrectPageURL(pageName);
 	}
 
 	@And("^Search results contain the following products$")
 	public void verifyProductsInSearchResults(List<String> bookList) {
 		for (String bookName : bookList) {
-			List<WebElement> books = DriverManager.getDriver().findElements(
-					By.xpath("//div[@class='tab search']//*[contains(text(),'" + bookName + "')]"));
-			assertSoftly(softAssertions -> {
-				softAssertions.assertThat(books).isNotEmpty();
-			});
+			$$(byXpath("//div[@class='tab search']//*[contains(text(),'" + bookName + "')]"))
+					.shouldHave(sizeGreaterThan(0));
 		}
 	}
 
 	@And("^I apply the following search filters$")
 	public void applySearchFiltersAndClickOnRefineResultsButton(Map<String, String> filterNameAndValue) {
 		for (Map.Entry<String, String> map : filterNameAndValue.entrySet()) {
-			Select dropDown = new Select(DriverManager.getDriver().findElement(
-					By.xpath(searchResultsPage.formatLocatorForYourSearchDropDown(map.getKey()))));
-
+			SelenideElement dropDown = $(byXpath(searchResultsPage.formatLocatorForYourSearchDropDown(map.getKey())));
 			basePage.selectValueInDropDown(dropDown, map.getValue());
 		}
 		searchResultsPage.clickOnRefineResultsButton();
@@ -71,14 +61,11 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 	@Then("^Search results contain only the following products$")
 	public void verifySearchResultsContainProducts(List<String> expectedBookList) {
 		for (String bookName : expectedBookList) {
-			List<WebElement> books = DriverManager.getDriver().findElements(
-					By.xpath("//div[@class='tab search']//*[contains(text(),'" + bookName + "')]"));
-			assertSoftly(softAssertions -> {
-				softAssertions.assertThat(books).isNotEmpty();
-			});
+			$$(byXpath("//div[@class='tab search']//*[contains(text(),'" + bookName + "')]"))
+					.shouldHave(sizeGreaterThan(0));
 		}
-		List<WebElement> booksOnPage = searchResultsPage.getAllBooksOnSearchPage();
-		Assert.assertEquals(expectedBookList.size(), booksOnPage.size());
+		ElementsCollection booksOnPage = searchResultsPage.getAllBooksOnSearchPage();
+		booksOnPage.shouldBe(sizeLessThanOrEqual(expectedBookList.size()));
 	}
 
 	@When("I click \"Add to basket\" button for product with name \"Thinking in Java\"")
@@ -93,16 +80,14 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 
 	@Then("^I am redirected to the ([\\w\\s]+)$")
 	public void verifyUserIsRedirectedToBasketPageWithCorrectURL(String pageName) {
-		Assert.assertEquals("Basket page URL is incorrect", BasePage.getExpectedUrlValue(pageName), basePage.getPageURL());
+		basePage.assertCorrectPageURL(pageName);
 	}
 
 	@And("^Basket order summary is as following:$")
 	public void verifyBasketOrderSummary(List<Map<String, String>> orderSummary) {
 		assertSoftly(softAssertions -> {
-			softAssertions.assertThat(basketPage.getDeliveryCostTextValue()).as("Delivery cost is incorrect").isEqualTo(
-					orderSummary.get(0).get("Delivery cost"));
-			softAssertions.assertThat(basketPage.getOrderTotalTextValue()).as("Order total is incorrect").isEqualTo(
-					orderSummary.get(0).get("Total"));
+			basketPage.assertTextOfDeliveryCostValue(orderSummary.get(0).get("Delivery cost"));
+			basketPage.assertTextOfOrderCostValue(orderSummary.get(0).get("Total"));
 		});
 	}
 
@@ -113,7 +98,7 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 
 	@Then("^I am transferred to ([\\w\\s]+)$")
 	public void verifyUserIsTransferredToCheckoutPage(String pageName) {
-		Assert.assertEquals("Checkout page URL is incorrect", BasePage.getExpectedUrlValue(pageName), basePage.getPageURL());
+		basePage.assertCorrectPageURL(pageName);
 	}
 
 	@When("I click \"Buy now\" button")
@@ -125,9 +110,7 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 	public void verifyErrorMessagesOnDeliveryAddressForm(List<Map<String, String>> listOfInputFieldsAndErrorMessages) {
 		for (Map<String, String> map : listOfInputFieldsAndErrorMessages) {
 			assertSoftly(softAssertions -> {
-				softAssertions.assertThat(checkoutPage.getErrorMessageText(map.get("Form field name"))).as(
-						"Validation error message is incorrect at Address form").isEqualTo(
-						map.get("validation error message"));
+				checkoutPage.assertDeliveryAddressErrorMessageText(map.get("Form field name"), map.get("validation error message"));
 			});
 		}
 	}
@@ -135,22 +118,17 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 	@And("^The following validation error messages are displayed on 'Payment' form:$")
 	public void verifyValidationErrorMessagesOnPaymentForm(List<String> listOfErrorMessages) {
 		for (String errorMessage : listOfErrorMessages) {
-			Assert.assertEquals("Validation error message is incorrect at Payment form", errorMessage,
-					checkoutPage.getTextOfErrorMessagesAtPaymentForm().replaceAll("[\\t\\n\\r]", " "));
+			checkoutPage.assertPaymentFormErrorMessageText(errorMessage);
 		}
 	}
 
 	@And("^Checkout order summary is as following:$")
 	public void verifyCheckoutOrderSummary(List<Map<String, String>> orderSummary) {
 		assertSoftly(softAssertions -> {
-			softAssertions.assertThat(checkoutPage.getSubtotalTextValue()).as("Subtotal is incorrect").isEqualTo(
-					orderSummary.get(0).get("Sub-total"));
-			softAssertions.assertThat(checkoutPage.getDeliveryTextValue()).as("Delivery is incorrect").isEqualTo(
-					orderSummary.get(0).get("Delivery"));
-			softAssertions.assertThat(checkoutPage.getTaxTextValue()).as("Tax is incorrect").isEqualTo(
-					orderSummary.get(0).get("VAT"));
-			softAssertions.assertThat(checkoutPage.getOrderTotalTextValue()).as("Order total is incorrect").isEqualTo(
-					orderSummary.get(0).get("Total"));
+			checkoutPage.assertTextOfSubtotalValue(orderSummary.get(0).get("Sub-total"));
+			checkoutPage.assertTextOfDeliveryValue(orderSummary.get(0).get("Delivery"));
+			checkoutPage.assertTextOfTaxValue(orderSummary.get(0).get("VAT"));
+			checkoutPage.assertTextOfOrderTotalValue(orderSummary.get(0).get("Total"));
 		});
 	}
 
@@ -160,8 +138,8 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 	}
 
 	@When("^I fill delivery address information manually:$")
-	public void fillDeliveryAddressInfo(DataTable table) {
-		List<Map<String, String>> userList = table.asMaps(String.class, String.class);
+	public void fillDeliveryAddressInfo(List<Map<String, String>> userList) {
+
 		for (Map<String, String> map : userList) {
 			UserDTO user = UserDTO.transform(map);
 			paymentForm.fillAddressForm(user);
@@ -170,7 +148,7 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 
 	@Then("There are no validation error messages displayed on \"Delivery Address\" form")
 	public void verifyAbsenceOfErrorMessage() {
-		Assert.assertFalse(checkoutPage.areErrorMessagesDisplayed());
+		checkoutPage.assertThatErrorMessagesAreNotDisplayed();
 	}
 
 	@When("^I enter my card details$")
@@ -190,3 +168,4 @@ public class DesktopCheckoutForGuestUserStepDefinitions {
 		}
 	}
 }
+

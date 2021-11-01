@@ -1,23 +1,17 @@
 package Pages;
+import static com.codeborne.selenide.Selectors.byXpath;
+import static com.codeborne.selenide.Selenide.*;
 
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Action;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
 
-import CucumberDriver.DriverManager;
+import com.codeborne.selenide.SelenideElement;
 
 public class HomePage extends BasePage {
-	@FindBy(xpath = "//input[@name='searchTerm']")
-	WebElement searchInputField;
-
-	@FindBy(xpath = "//button[@aria-label='Search']")
-	WebElement searchButton;
+	SelenideElement searchInputField = $(byXpath("//input[@name='searchTerm']"));
+	SelenideElement searchButton = $(byXpath("//button[@aria-label='Search']"));
 
 	public void enterSearchValue(String text) {
-		Actions builder = new Actions(DriverManager.getDriver());
-		Action seriesOfActions = builder
+		actions()
 				.moveToElement(searchInputField)
 				.click()
 				.keyDown(searchInputField, Keys.SHIFT)
@@ -25,7 +19,7 @@ public class HomePage extends BasePage {
 				.keyUp(searchInputField, Keys.SHIFT)
 				.moveToElement(searchButton)
 				.click()
-				.build();
-		seriesOfActions.perform();
+				.build()
+				.perform();
 	}
 }

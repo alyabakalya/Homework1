@@ -1,23 +1,15 @@
 package CucumberDriver;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import com.codeborne.selenide.Configuration;
+
 
 public class DriverManager {
-	private static WebDriver driver;
-
-	public static void setUpDriver() {
+	public static void setUpBrowserConfigurations() {
 		System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
+		Configuration.browser = "chrome";
+		Configuration.browserSize = "1920x1080";
+		Configuration.screenshots = true;
+		Configuration.reportsFolder = "src/main/resources/reports";
 	}
-
-	public static WebDriver getDriver() {
-		return driver;
-	}
-
-	public  static void quitDriver(){
-		driver.quit();
-	}
-
 }
+

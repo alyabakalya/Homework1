@@ -1,12 +1,9 @@
 package Pages;
-
-import org.openqa.selenium.WebDriver;
-import CucumberDriver.DriverManager;
+import static com.codeborne.selenide.Selenide.*;
 
 public class PageNavigation extends BasePage {
 
-	public static WebDriver openPage(WebDriver driver, String pageUrl) {
-		DriverManager.getDriver().get(pageUrl);
-		return driver;
+	public static void openPage(String pageUrl) {
+		open(pageUrl);
 	}
 }
